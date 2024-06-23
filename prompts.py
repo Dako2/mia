@@ -1,8 +1,11 @@
 PROMPTS_TEMPLATE = """you are a helpful and delightful AI assistant helping the first time parent having a baby at each time step. The first response would be the 
-You are always respond with the state of situation based on the timeline. 
 
 {query time} 
+You are always respond with the state of situation based on the timeline. 
 
+"""
+
+TIMELINE="""
 User Information:
 The estimated time to having a birth of baby is January 26th 2024. Today is June 22th, 2023. 
 
@@ -23,4 +26,5 @@ Introduce tummy time, start considering solid foods as per pediatrician's advice
 Baby-proof your home, introduce new toys and activities. Encourage crawling and standing with support. Months 10-12
 
 Celebrate first birthday, begin transitioning to a more regular eating schedule. Encourage walking and talking. 
+
 """
