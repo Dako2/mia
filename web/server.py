@@ -11,6 +11,7 @@ from ai21.models import ChatMessage
 from openai import OpenAI
 import json
 
+JAMBA = False
 def load_json(filepath):
     with open(filepath, 'r') as f:
         return json.load(f)
@@ -44,15 +45,15 @@ def chat():
         history.append(data)
 
     history_str = "\n".join([f"Week {i+1}: {history[i]}" for i in range(len(history))])
-
-
     prompt = PROMPTS_TEMPLATE.format(birth_time="August 30, 2024", query_time=date, week=week, data=history_str) + user_message
     
-    
     print(f"\n\n\n\n\n{prompt}\n\n\n\n\n")
-    bot_message = call_jamba(prompt)
+    if not JAMBA:
+        bot_message = call_openai(prompt)
+    else:
+        bot_message = call_jamba(prompt)
 
-    return jsonify({"message": bot_message})
+    return jsonify({"message": "\nMia:"+bot_message})
 
 def call_openai(prompt,temperature=.7):
     # using openAI client
@@ -64,7 +65,6 @@ def call_openai(prompt,temperature=.7):
     ]
     )
     return completion.choices[0].message.content
-
 
 def call_jamba(prompt, temperature=.7):
     url = "https://api.ai21.com/studio/v1/chat/completions"
