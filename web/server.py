@@ -32,7 +32,7 @@ def chat():
     date = request.json.get('current_date')
 
     prompt = PROMPTS_TEMPLATE.format(birth_time="August 30, 2024", query_time=date, week=week) + user_message
-    bot_message = call_jamba(prompt)
+    bot_message = call_openai(prompt)
 
     return jsonify({"message": bot_message})
 
