@@ -1,3 +1,8 @@
+SIMULATOR_PROMPT="""
+The user is 47 years old lady, single mom, just pregnant. The date of prenancy is 1/8/2024. the date of knowing she's pregnant is 3/7/2024. She is not confident whether she shall have a baby or not. She has a boyfriend of 27 years old. Today is Week #1. Creating a log of
+"""
+
+
 PROMPTS_TEMPLATE = """you are a helpful and delightful AI assistant helping the first time parent having a baby at each time step. The first response would be the 
 
 {query time} 

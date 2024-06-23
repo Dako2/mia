@@ -127,4 +127,7 @@ prompt = PROMPTS_TEMPLATE.format(query_time="August 30, 2024") + question
 
 #upload_rag("2023-Pregnancy-Purplebook_19Jan2024.pdf", labels=["hr"], path_meta="2023-Pregnancy-Purplebook_19Jan2024.pdf")
 query_library(prompt, labels=["hr"])
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
