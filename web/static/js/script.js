@@ -3,6 +3,8 @@ document.getElementById('weekSlider').addEventListener('input', function() {
     document.getElementById('weekLabel').innerText = weekValue;
     const estimatedDate = calculateEstimatedDate(weekValue);
     document.getElementById('estimatedDate').innerText = estimatedDate;
+    changeBackgroundImage(weekValue);
+    loadWeekData(weekValue);
 });
 
 function calculateEstimatedDate(week) {
@@ -12,6 +14,34 @@ function calculateEstimatedDate(week) {
     return estimatedDate.toISOString().split('T')[0];
 }
 
+function changeBackgroundImage(week) {
+    let imagePath = '';
+    if (week >= 1 && week <= 8) {
+        imagePath = 'static/img/week_1-8.jpeg';
+    } else if (week >= 9 && week <= 12) {
+        imagePath = 'static/img/week_9-12.jpeg';
+    } else if (week >= 13 && week <= 16) {
+        imagePath = 'static/img/week_13-16.jpeg';
+    } else if (week >= 17 && week <= 20) {
+        imagePath = 'static/img/week_17-20.jpeg';
+    } else if (week >= 21 && week <= 24) {
+        imagePath = 'static/img/week_21-24.jpeg';
+    } else if (week >= 25 && week <= 28) {
+        imagePath = 'static/img/week_25-28.jpeg';
+    } else if (week >= 29 && week <= 32) {
+        imagePath = 'static/img/week_29-32.jpeg';
+    } else if (week >= 33 && week <= 36) {
+        imagePath = 'static/img/week_33-36.jpeg';
+    } else if (week >= 37 && week <= 40) {
+        imagePath = 'static/img/week_37-40.jpeg';
+    }
+    const imageContainer = document.getElementById('imageContainer');
+    if (imageContainer) {
+        imageContainer.style.backgroundImage = `url(${imagePath})`;
+    } else {
+        console.error('Error: imageContainer element not found.');
+    }
+}
 function sendMessage() {
     const userInput = document.getElementById('userInput').value;
     const week = document.getElementById('weekSlider').value;
@@ -70,5 +100,23 @@ function displayWeekData(data) {
     document.getElementById('highlights').value = data["Highlights of the Week"] || '';
     document.getElementById('goal').value = data["Your goal"] || '';
     document.getElementById('toDoList').value = data["To Do List"] || '';
+    document.getElementById('notes').value = data["Notes"] || '';
+}
+
+function loadWeekData(week) {
+    fetch(`static/data/week_${week}.json`)
+        .then(response => response.json())
+        .then(data => displayWeekData(data[`Week ${week}`]))
+        .catch(error => console.error('Error loading week data:', error));
+}
+
+function displayWeekData(data) {
+    // Display the data on the page as needed.
+    // Assuming the JSON data has keys like "I am feeling", "Symptoms", "Highlights of the Week", "My Goal", "To Do List", and "Notes".
+    document.getElementById('feeling').value = data["I am feeling"] || '';
+    document.getElementById('symptoms').value = data["Symptoms"] || '';
+    document.getElementById('highlights').value = data["Highlights of the Week"] || '';
+    document.getElementById('goal').value = data["My Goal"] || '';
+    document.getElementById('toDoList').value = data["To Do List"].join('\n') || '';
     document.getElementById('notes').value = data["Notes"] || '';
 }
