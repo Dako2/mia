@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baby Preparation Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Mia -- Bring Happiness and Healthiness in "Baby Preparation"</h1>
+        <div class="week-slider-container">
+            <label for="weekSlider">Week <span id="weekLabel">1</span> - Date: <span id="estimatedDate">2024-01-01</span></label>
+            <input type="range" id="weekSlider" min="1" max="60" value="1" class="slider">
+        </div>
+        <div class="form-container">
+            <div class="left-column">
+                <div class="form-group">
+                    <label for="feeling">I am feeling ...</label>
+                    <textarea id="feeling" rows="4" placeholder="Describe your feelings..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="symptoms">Symptoms ...</label>
+                    <textarea id="symptoms" rows="4" placeholder="Describe any symptoms..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="highlights">Highlights of the Week</label>
+                    <textarea id="highlights" rows="4" placeholder="Highlight of the week..."></textarea>
+                </div>
+            </div>
+            <div class="right-column">
+                <div class="form-group">
+                    <label for="goal">My Goal</label>
+                    <textarea id="goal" rows="2" placeholder="Your goal..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="toDoList">To Do List</label>
+                    <textarea id="toDoList" rows="6" placeholder="Your to do list..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" rows="4" placeholder="Additional notes..."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="chat-container">
+            <div id="chatBox" class="chat-box">
+                <!-- Chat messages will appear here -->
+            </div>
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="Type a message...">
+                <button type="button" onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
