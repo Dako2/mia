@@ -9,7 +9,8 @@ import re
 from docx import Document
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
-
+from openai import OpenAI
+client = OpenAI()
 
 api_key = "6uLGd9BlDczVhorg0PCBBCiHKbuF8YJ8" #os.getenv("AI21_API_KEY")
 
@@ -41,6 +42,19 @@ def get_answered_questions(user_input, questions):
                 unanswered_questions[category] = "None"
 
     return answered_questions, unanswered_questions
+
+def call_openai(prompt,temperature=.7):
+    # using openAI client
+    response = client.create(
+        model="gpt-3.5-turbo",
+        prompt=prompt,
+        temperature=temperature,
+        max_tokens=1000,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+    )  
+    return response.choices[0].text
 
 def call_jamba(prompt,temperature=.7):
 
@@ -98,7 +112,7 @@ def query_library(query, labels=None, path=None):
     else:
       print("No answer found")
 
-      
+
 client = AI21Client(api_key=api_key)
 
 PROMPTS_TEMPLATE = """you are a helpful and delightful AI assistant helping the first time parent having a baby at each time step. The expected due date is
@@ -113,3 +127,4 @@ prompt = PROMPTS_TEMPLATE.format(query_time="August 30, 2024") + question
 
 #upload_rag("2023-Pregnancy-Purplebook_19Jan2024.pdf", labels=["hr"], path_meta="2023-Pregnancy-Purplebook_19Jan2024.pdf")
 query_library(prompt, labels=["hr"])
+
