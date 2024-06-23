@@ -10,14 +10,18 @@ from docx import Document
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 from openai import OpenAI
-client = OpenAI()
+import autogen
+from autogen import AssistantAgent, UserProxyAgent
+from jamba_autogen import JambaModelClient
+
+
 
 api_key = "6uLGd9BlDczVhorg0PCBBCiHKbuF8YJ8" #os.getenv("AI21_API_KEY")
 
 #In order to speed up the answer to the questions, we will call AI21 Contextual Answers in Parallel
 def call_ca_parallel(args):
     article, question, category = args
-    response = client.answer.create(
+    response = ai21_client.answer.create(
         context=article,
         question=question
     )
@@ -45,16 +49,17 @@ def get_answered_questions(user_input, questions):
 
 def call_openai(prompt,temperature=.7):
     # using openAI client
-    response = client.create(
+    response = oai_client.chat.completion.create(
         model="gpt-3.5-turbo",
-        prompt=prompt,
-        temperature=temperature,
+        messages=[
+            {"role": "system", "content": ""},
+            {"role": "user", "content": f"{prompt}"},
+        ],
         max_tokens=1000,
+        temperature=temperature,
         top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-    )  
-    return response.choices[0].text
+    )
+    return response.choices[0].message.content
 
 def call_jamba(prompt,temperature=.7):
 
@@ -93,7 +98,7 @@ def call_jamba(prompt,temperature=.7):
     return(reply)
 
 def upload_rag(path, labels, path_meta):
-    response = client.library.files.create(
+    response = ai21_client.library.files.create(
         file_path=path,
         labels=labels,
         path=path_meta
@@ -101,7 +106,7 @@ def upload_rag(path, labels, path_meta):
     print(response)
 
 def query_library(query, labels=None, path=None):
-    response = client.library.answer.create(
+    response = ai21_client.library.answer.create(
         question=query,
         path=path,
         #labels=labels
@@ -112,8 +117,8 @@ def query_library(query, labels=None, path=None):
     else:
       print("No answer found")
 
-
-client = AI21Client(api_key=api_key)
+ai21_client = AI21Client(api_key=api_key)
+oai_client = OpenAI()
 
 PROMPTS_TEMPLATE = """you are a helpful and delightful AI assistant helping the first time parent having a baby at each time step. The expected due date is
 
@@ -128,3 +133,66 @@ prompt = PROMPTS_TEMPLATE.format(query_time="August 30, 2024") + question
 #upload_rag("2023-Pregnancy-Purplebook_19Jan2024.pdf", labels=["hr"], path_meta="2023-Pregnancy-Purplebook_19Jan2024.pdf")
 query_library(prompt, labels=["hr"])
 
+config_list_custom = autogen.config_list_from_json(
+    "OAI_CONFIG_LIST",
+    filter_dict={"model_client_cls": ["JambaModelClient"]},
+)
+
+assistant = AssistantAgent("assistant", llm_config={"config_list": config_list_custom})
+user_proxy = UserProxyAgent(
+    "user_proxy",
+    code_execution_config={
+        "work_dir": "coding",
+        "use_docker": False,  # Please set use_docker=True if docker is available to run the generated code. Using docker is safer than running the generated code directly.
+    },
+)
+assistant.register_model_client(model_client_cls=JambaModelClient)
+user_proxy.initiate_chat(assistant, message="Write python code to print Hello World!")
+
+config_list = autogen.config_list_from_json(
+    "OAI_CONFIG_LIST",
+    filter_dict={
+        "model": ["gpt-4", "gpt-4-turbo", "gpt-4o"], # , "jamba"
+    },
+)
+
+llm_config = {"config_list": config_list, "cache_seed": 42}
+mia = autogen.UserProxyAgent(
+    name="mia",
+    system_message="A human admin.",
+    code_execution_config={
+        "last_n_messages": 2,
+        "work_dir": "groupchat",
+        "use_docker": False,
+    },  # Please set use_docker=True if docker is available to run the generated code. Using docker is safer than running the generated code directly.
+    human_input_mode="TERMINATE",
+)
+
+alice = autogen.AssistantAgent(
+    name="alice",
+    system_message="Provide emotional support.",
+    llm_config=llm_config,
+)
+
+ob = autogen.AssistantAgent(
+    name="ob",
+    system_message="Provide medical information.",
+    llm_config=llm_config,
+)
+
+alex = autogen.AssistantAgent(
+    name="alex",
+    system_message="Provide scheduling information and help schedule appointments.",
+    llm_config=llm_config,
+)
+
+groupchat = autogen.GroupChat(agents=[mia, alice, ob, alex], messages=[], max_round=12)
+manager = autogen.GroupChatManager(groupchat=groupchat, llm_config=llm_config)
+
+mia.initiate_chat(
+    manager, message="Find when I should schedule a B-mode ultrasonography scan."
+)
+
+mia.initiate_chat(
+    manager, message="I feel too tired and depressed."
+)
